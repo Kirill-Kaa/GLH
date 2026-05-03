@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block extra_css %}
+<style>
+    .btn-outline-purple {
+        color: #d136d6;
+        border-color: #d136d6;
+    }
+
+    .btn-outline-purple:hover {
+        background-color: #d136d6;
+        color: white;
+    }
+</style>
+
+{% endblock %}
+{% block content %}
+
+<section class="header">
+    <div class="text-center">
+        <h1 class="display-2 " style="font-family:'Playfair Display'">Sign In</h1>
+    </div>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<section class="mt-5 mb-5">
+    <div class="row d-flex align-items-center justify-content-center">
+        <div class="col-4">
+            <img src="/static/img/login.jpg" class="img-fluid rounded" alt="login image">
+        </div>
+        <div class="col-6">
+            <form method="POST">
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control">
+                </div>
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control">
+                </div>
+                <div class="d-flex justify-content-around align-items-center mb-4">
+                    <a href="#!">Forgot password?</a>
+                    <p><strong>or</strong></p>
+                    <a href="{{url_for('register')}}" class="btn btn-outline-purple">Register</a>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Sign in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

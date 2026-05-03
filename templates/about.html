@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+{% block content %}
+
+<section class="header mb-5">
+    <img src="/static/img/about_header.jpg" alt="header">
+    <div class="header-overlay text-center text-white">
+        <h1>Our Story</h1>
+        <h5>Discover more about Greenfied Local Hub here</h5>
+    </div>
+</section>
+
+<div class="row">
+    <div class="col-lg-8">
+        <h2>How we grow our <span style="color: #1e993f;">food</span></h2>
+        <p>At our farm, growing food is more than just a process — it’s a commitment to quality, community, and care for
+            the land. Every fruit, vegetable, and product we offer is cultivated with attention to detail, respect for
+            nature, and a belief that healthy food starts with healthy soil.
+        </p>
+        <p>
+            Our approach focuses on working with nature, not against it. We use sustainable farming practices that
+            protect the soil, conserve water, and encourage biodiversity. This means fewer chemicals, healthier crops,
+            and a cleaner environment for future generations.
+
+            We carefully rotate crops, enrich the soil with natural compost, and rely on balanced ecosystems to keep
+            plants thriving. The result is food that’s not only better for you, but also better for the planet.
+        </p>
+    </div>
+    <div class="col-lg-4">
+        <img src="/static/img/about1.jpg" class="img-fluid rounded" alt="farm plantation" style="height: 300px;">
+    </div>
+</div>
+
+<section class="producers mt-5">
+    <div class="text-center">
+        <h3>Our food producers</h3>
+    </div>
+    {% if producers %}
+    <div class="row">
+        {% for producer in producers %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card shadow h-100" >
+                <img src="{{ producer.image_url }}" alt="{{ producer.name }}" height="300">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ producer.name }}</h5>
+                    <h6 class="card-text">Founded at {{ producer.founded_year }}</h6>
+                    <p class="card-text text-muted">{{ producer.description }}</p>
+                    <h6 class="card-text">{{ producer.specialty }}</h6>
+                    
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h3 class="mt-3">No producers found</h3>
+        <p class="text-muted">Try selecting a different category</p>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

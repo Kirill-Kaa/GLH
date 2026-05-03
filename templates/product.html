@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} - Details{% endblock %}
+{% block extra_css %}
+<style>
+    .product-detail {
+        padding: 60px 0;
+    }
+
+    .product-info {
+        padding: 20px;
+    }
+
+    .price-large {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--success-color);
+    }
+
+    .quantity-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--success-color);
+        background: white;
+        color: var(--success-color);
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .quantity-btn:hover {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<section class="main rounded">
+    <div class="product-detail">
+        <div class="container">
+            <!--
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}-->
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('catalogue') }}">Menu</a></li>
+                    <li class="breadcrumb-item active">{{ product.name }}</li>
+                </ol>
+            </nav>
+            <div class="row mt-4 rounded" style="background-color: #ebd5ab;">
+                <div class="col-lg-6 my-4">
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image-large rounded"
+                        width="100%">
+                </div>
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <span class="badge bg-success mb-3">{{ product.category }}</span>
+                        <h1 class="display-5 fw-bold mb-3">{{ product.name }}</h1>
+                        <p class="lead text-muted mb-4">{{ product.description }}</p>
+
+                        <div class="mb-4">
+                            <span class="price-large">£{{ "%.2f"|format(product.price) }}</span>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Quantity:</label>
+                                <div class="quantity-control">
+                                    <button type="button" class="quantity-btn" onclick="decreaseQty()">−</button>
+                                    <input type="number" id="quantity" name="quantity" class="quantity-input" value="1"
+                                        min="1" max="50">
+                                    <button type="button" class="quantity-btn" onclick="increaseQty()">+</button>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-block">
+                                {% if session.get('user_id') %}
+                                <button type="submit" class="btn btn-success btn-lg px-5">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                </button>
+                                {% else %}
+                                <a href="{{ url_for('login') }}" class="btn btn-success btn-lg px-5">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login to Add to Cart
+                                </a>
+                                {% endif %}
+                                <a href="{{ url_for('catalogue') }}" class="btn btn-outline-secondary btn-lg px-5">
+                                    <i class="bi bi-arrow-left"></i> Back to Menu
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script>
+    function increaseQty() {
+        const input = document.getElementById('quantity');
+        const currentValue = parseInt(input.value);
+        if (currentValue < 50) {
+            input.value = currentValue + 1;
+        }
+    }
+
+    function decreaseQty() {
+        const input = document.getElementById('quantity');
+        const currentValue = parseInt(input.value);
+        if (currentValue > 1) {
+            input.value = currentValue - 1;
+        }
+    }
+</script>
+
+{% endblock %}

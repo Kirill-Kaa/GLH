@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block extra_css %}
+<style>
+    .header-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        background-color: #628141;
+        padding: 20px 70px;
+        border-radius: 60px;
+    }
+
+    .header-overlay h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: 'Playfair Display'
+    }
+
+    .card-icon {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+    }
+
+    .card {
+        transition: transform .2s;
+    }
+
+    .card:hover {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<section class="header">
+    <div>
+        <img src="/static/img/home-header.jpg" alt="header">
+    </div>
+    <div class="header-overlay text-center text-white">
+        <h1>Greenfield Local Hub</h1>
+        <div class="mt-3">
+            <a href="{{url_for('catalogue')}}" class="btn btn-success me-2">Shop Now</a>
+            <a href="{{url_for('about')}}" class="btn btn-light">Learn More</a>
+        </div>
+    </div>
+</section>
+
+<section class="about mt-5">
+    <div class="text-center">
+        <h3>About <span class="fs-1" style="font-family: Playful Display;">Greenfield Local Hub</span></h3>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique quam, pariatur ratione officia quasi
+            tenetur provident ex odit quisquam molestias.</p>
+    </div>
+    <div class="row text-center">
+        <div class="col-lg-3  mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body d-flex flex-column align-items-center">
+                    <img src="/static/img/icons/plant.png" class="card-icon mb-3">
+                    <h5 class="text-success">Healthy Plant Based</h5>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body d-flex flex-column align-items-center">
+                    <img src="/static/img/icons/oil.png" class="card-icon mb-3">
+                    <h5 class="text-success">Local Food</h5>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body d-flex flex-column align-items-center">
+                    <img src="/static/img/icons/comunity.png" class="card-icon mb-3">
+                    <h5 class="text-success">Community Cooperation</h5>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body d-flex flex-column align-items-center">
+                    <img src="/static/img/icons/love.png" class="card-icon mb-3">
+                    <h5 class="text-success">Love Our Customers</h5>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="production mt-5">
+    <div class="text-center">
+        <h3>Our Proucts</h3>
+        <p>That is out top selling proudcts in this month. You always can find more products on <a
+                href="{{url_for('catalogue')}}" class="text-decoration-none">catalogue page</a>.</p>
+    </div>
+    {% if products %}
+    <div class="row">
+        {% for product in products[:3] %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card shadow h-100">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" height="300">
+                <span class="category-badge">{{ product.category }}</span>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}"
+                            class="text-dark text-decoration-none">{{ product.name }}</a>
+                    </h5>
+                    <p class="card-text text-muted">{{ product.description }}</p>
+                    <div class="d-flex justify-content-between mt-auto align-items-center">
+                        <span class="price-tag">£{{ "%.2f"|format(product.price) }}</span>
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-success">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h3 class="mt-3">No products found</h3>
+        <p class="text-muted">Try selecting a different category</p>
+    </div>
+    {% endif %}
+</section>
+</div>
+
+<section class="news mt-5 py-5" style="background-color: bisque;">
+    <div class="container">
+
+        <div class="text-center">
+            <h3> Waht new on Farms</h3>
+            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Neque totam accusantium architecto dolorum
+                doloremque vero tenetur dolore rerum veniam exercitationem.</p>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <div class="card shadow h-100">
+                    <img src="/static/img/farm1.jpg" alt="farm1">
+                    <div class="card-body">
+                        <p>NHS confirmed that our farms provides healthiest food over whole country</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card shadow h-100">
+                    <img src="/static/img/farm2.jpg" alt="farm1">
+                    <div class="card-body">
+                        <p>Scientists confirmed thet mail produced on our farms has little shine that you can see in
+                            darkness.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card shadow h-100">
+                    <img src="/static/img/farm3.jpg" alt="farm1">
+                    <div class="card-body">
+                        <p>— Гуси, гуси!— Га-га-га!— Есть хотите?— Да-да-да!— Ну, летите!— Нам нельзя!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

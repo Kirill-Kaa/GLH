@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block extra_css %}
+<style>
+    .btn-purple {
+        background-color: #d136d6;
+        color: white;
+        border: none;
+    }
+
+    .btn-purple:hover {
+        background-color: #d136d6;
+    }
+</style>
+
+{% endblock %}
+{% block content %}
+
+<section class="header">
+    <div class="text-center">
+        <h1 class="display-2 " style="font-family:'Playfair Display'">Register</h1>
+    </div>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<section class="mt-5 mb-5">
+    <div class="row d-flex align-items-center justify-content-center">
+        <div class="col-6">
+            <form method="POST">
+                <div data-mdb-input-init class="form-outline mb-4">
+                    <label class="form-label" for="username">Your name</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
+                </div>
+                <div data-mdb-input-init class="form-outline mb-4">
+                    <label class="form-label" for="email">Email address</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+
+                <div data-mdb-input-init class="form-outline mb-4">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-purple">Register</button>
+                </div>
+
+                <div class="d-flex justify-content-around align-items-center mt-4">
+                    <p class="text-primary">Have an account?</p>
+                    <a href="{{url_for('login')}}" class="btn btn-outline-primary">Login</a>
+                </div>
+            </form>
+        </div>
+        <div class="col-4">
+            <img src="/static/img/register.jpg" class="img-fluid rounded" alt="login image">
+        </div>
+    </div>
+</section>
+
+{% endblock %}

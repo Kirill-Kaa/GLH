@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delivery-option {
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    
+    .delivery-option:hover {
+        border-color: var(--primary-color);
+        background-color: #ffffff;
+    }
+    
+    .delivery-option.active {
+        border-color: var(--primary-color);
+        background-color: #ffffff;
+        border-width: 3px;
+    }
+    
+    .delivery-option input[type="radio"] {
+        display: none;
+    }
+    
+    .delivery-option h5 {
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+    
+    .payment-option {
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .payment-option:hover {
+        border-color: var(--primary-color);
+    }
+    
+    .payment-option.active {
+        border-color: var(--primary-color);
+        background-color: #fff5f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="header">
+    <div class="text-center">
+        <h1 class="display-2 ">Checkout</h1>
+    </div>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="row mb-5">
+    <div class="col-lg-7">
+        <form method="POST" action="{{ url_for('process_checkout') }}" id="checkoutForm">
+
+            <!-- Delivery or Collection -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Delivery or Collection?</h4>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="delivery-option active" id="deliveryOption">
+                                <input type="radio" name="order_type" value="delivery" checked onchange="toggleOrderType()">
+                                <h5>Delivery</h5>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="delivery-option" id="collectOption">
+                                <input type="radio" name="order_type" value="collection" onchange="toggleOrderType()">
+                                <h5>Collect</h5>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Your Information</h4>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" value="{{user.full_name or ''}}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone or '' }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Address (shown only for delivery) -->
+            <div class="card shadow-sm mb-4" id="deliverySection">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Delivery Address</h4>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Delivery Address</label>
+                        <input type="text" class="form-control" id="address" name="address" value="{{ user.address or '' }}" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" value="{{ user.city or '' }}">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="postal_code" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ user.postal_code or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="delivery_notes" class="form-label">Delivery Notes (Optional)</label>
+                        <textarea class="form-control" id="delivery_notes" name="notes" rows="2" placeholder="e.g., Ring the doorbell, leave at door..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collection Info (shown only for collection) -->
+            <div class="card shadow-sm mb-4" id="collectionSection" style="display: none;">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Collection Details</h4>
+
+                    <div class="alert alert-info">
+                        <h6> Collect from:</h6>
+                        <p class="mb-1"><strong>GLH local outlet</strong></p>
+                        <p class="mb-1">321 Non Street</p>
+                        <p class="mb-1">Bristol, BS1 2AB</p>
+                        <p class="mb-0"><i class="bi bi-clock"></i> Ready in 20-30 minutes</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="collection_time" class="form-label">Preferred Collection Time</label>
+                        <select class="form-select" id="collection_time" name="collection_time">
+                            <option value="asap">As soon as possible</option>
+                            <option value="30min">In 30 minutes</option>
+                            <option value="1hour">In 1 hour</option>
+                            <option value="1.5hours">In 1.5 hours</option>
+                            <option value="2hours">In 2 hours</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="collection_notes" class="form-label">Special Instructions (Optional)</label>
+                        <textarea class="form-control" id="collection_notes" name="notes" rows="2"
+                            placeholder="Any special requests..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Payment Method</h4>
+
+                    <div class="payment-option active" id="paymentOnline">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="cashOnDelivery"
+                                value="cash_on_delivery" checked onchange="updatePaymentUI()">
+                            <label class="form-check-label w-100" for="cashOnDelivery">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="bi bi-cash-coin"></i>
+                                        <span id="cashPaymentLabel">Cash on Delivery</span>
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="payment-option">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="card" value="card"
+                                disabled onchange="updatePaymentUI()">
+                            <label class="form-check-label w-100 text-muted" for="card">
+                                <i class="bi bi-credit-card"></i> Credit/Debit Card (Coming Soon)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Order Summary</h4>
+
+                <div class="order-items mb-3" style="max-height: 300px; overflow-y: auto;">
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}"
+                                style="width: 50px; height: 50px; object-fit: cover;" class="me-3">
+                            <div>
+                                <h6 class="mb-0">{{ item.name }}</h6>
+                                <small class="text-muted">Qty: {{ item.quantity }}</small>
+                            </div>
+                        </div>
+                        <span class="fw-bold">£{{ "%.2f"|format(item.price * item.quantity) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span>£{{ "%.2f"|format(total) }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2 text-success" id="voucher-discount-row"
+                    style="display: none !important;">
+                    <span>Voucher Discount:</span>
+                    <span id="voucher-discount">-£0.00</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Delivery Fee:</span>
+                    <span class="text-success">FREE</span>
+                </div>
+                <hr>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <h5>Total:</h5>
+                    <h5 class="text-primary" id="final-total">£{{ "%.2f"|format(total) }}</h5>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold">You will earn:</h6>
+                    <strong class="text-info-emphasis">{{ (total * 100)|int }} points!</strong>
+                </div>
+                
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4"> Discounts & Rewards</h4>
+
+                        <!-- Vouchers -->
+                        {% if vouchers %}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Use a Discount Voucher:</label>
+                            <select class="form-select" name="voucher_id" id="voucher_select" form="checkoutForm"
+                                onchange="updateTotals()">
+                                <option value="">No voucher</option>
+                                {% for voucher in vouchers %}
+                                <option value="{{ voucher.id }}" data-discount="{{ voucher.discount_percent }}">
+                                    {{ voucher.discount_percent }}% OFF Voucher
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <hr>
+                        {% endif %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">You have points: </small>
+                            <strong id="points-earned">{{ points }} points (£{{ "%.2f"|format(points / 100)}})</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    const subtotalAmount = parseFloat("{{ total }}");
+
+                    function toggleOrderType() {
+                        const deliveryRadio = document.querySelector('input[name="order_type"][value="delivery"]');
+                        const collectionRadio = document.querySelector('input[name="order_type"][value="collection"]');
+                        const deliverySection = document.getElementById('deliverySection');
+                        const collectionSection = document.getElementById('collectionSection');
+                        const deliveryOption = document.getElementById('deliveryOption');
+                        const collectOption = document.getElementById('collectOption');
+                        const cashPaymentLabel = document.getElementById('cashPaymentLabel');
+                        const placeOrderText = document.getElementById('placeOrderText');
+
+                        if (deliveryRadio.checked) {
+                            deliveryOption.classList.add('active');
+                            collectOption.classList.remove('active');
+                            deliverySection.style.display = 'block';
+                            collectionSection.style.display = 'none';
+
+                            document.getElementById('address').required = true;
+                            document.getElementById('city').required = true;
+                            document.getElementById('postal_code').required = true;
+
+                            cashPaymentLabel.textContent = 'Cash on Delivery';
+                            placeOrderText.textContent = 'Place Order';
+                        } else {
+                            deliveryOption.classList.remove('active');
+                            collectOption.classList.add('active');
+                            deliverySection.style.display = 'none';
+                            collectionSection.style.display = 'block';
+
+           
+                            document.getElementById('address').required = false;
+                            document.getElementById('city').required = false;
+                            document.getElementById('postal_code').required = false;
+
+                            cashPaymentLabel.textContent = 'Pay Cash at Store';
+                            placeOrderText.textContent = 'Confirm Order';
+                        }
+                    }
+
+                    function updatePaymentUI() {
+                        const paymentOptions = document.querySelectorAll('.payment-option');
+                        paymentOptions.forEach(option => {
+                            const radio = option.querySelector('input[type="radio"]');
+                            if (radio.checked) {
+                                option.classList.add('active');
+                            } else {
+                                option.classList.remove('active');
+                            }
+                        });
+                    }
+
+                    function updateTotals() {
+                        const voucherSelect = document.getElementById('voucher_select');
+                        let voucherDiscount = 0;
+                        if (voucherSelect) {
+                            const selectedOption = voucherSelect.options[voucherSelect.selectedIndex];
+                            const discountPercent = parseFloat(selectedOption.getAttribute('data-discount')) || 0;
+                            voucherDiscount = subtotalAmount * (discountPercent / 100);
+                        }
+
+                        const totalDiscount = voucherDiscount
+                        const finalTotal = Math.max(0, subtotalAmount - totalDiscount);
+                        const pointsEarned = Math.floor(finalTotal * 100);
+
+                        // Update displays
+                        const voucherRow = document.getElementById('voucher-discount-row');
+
+                        if (voucherDiscount > 0 && voucherRow) {
+                            voucherRow.style.display = 'flex';
+                            document.getElementById('voucher-discount').textContent = '-£' + voucherDiscount.toFixed(2);
+                        } else if (voucherRow) {
+                            voucherRow.style.display = 'none';
+                        }
+
+                        document.getElementById('final-total').textContent = '£' + finalTotal.toFixed(2);
+                        document.getElementById('points-earned').textContent = pointsEarned;
+                    }
+                </script>
+                <div class="d-grid gap-2 mt-2">
+                    <button type="submit" form="checkoutForm" class="btn btn-success py-3">
+                        <i class="bi bi-bag-check"></i> Place Order</button>
+                    <a href="{{ url_for('cart') }}" class="btn btn-outline-secondary mt-1">
+                        <i class="bi bi-caret-left"></i> Back to Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
